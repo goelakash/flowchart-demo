@@ -1,0 +1,123 @@
+<head>
+	 <meta charset="UTF-8 ">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="jsPlumb-2.0.7-min.js"></script>
+
+    <style type="text/css">
+		.item {
+		position: absolute;
+		border: 1px solid black;
+		background-color: #ddddff;
+		}
+
+		#container {
+		border: 1px solid gray;
+		width: 500px;
+		height: 500px;
+		}
+
+		.move {
+		padding: 5px;
+		cursor: move;
+		background: green;
+		}
+
+		.title {
+		padding: 10px;
+		}
+
+		.showid {
+		padding: 1px;
+		color: red;
+		/*display: none;*/
+		}
+		.connect {
+		width: 100%;
+		height: 20px;
+		background-color: white;
+		cursor: pointer;
+		}
+
+    </style>
+
+    <title>Getting started with jsPlumb</title>
+  </head>
+
+  <body>
+    <form id="pipe-form">
+
+    <select id="myselect">
+    	<option val="1">John</option>
+    	<option val="2">Doe</option>
+    </select>
+     <button type="button" id="add">Add element</button>
+     <button type="submit" id="add">Final Submit</button>
+    </form>
+    <br>
+    <button type="button" id="showall">Show All</button>
+    <div id="container"></div>
+  </body>
+
+  <script type="text/javascript">
+
+  $("#showall").on("click",function(e){
+  	var childDivs = document.getElementById('container').getElementsByTagName('div');
+  	for(var i = 0; i<childDivs.length; i++)
+  		if(childDivs[i].className.indexOf("item")>-1)
+  			console.log(childDivs[i].id);
+
+  	e.stopPropagation();
+  })
+
+	jsPlumb.ready(function() {
+
+	  jsPlumb.setContainer($('#container'));
+
+	  var i = 0;
+
+	  $('#add').click(function(e) {
+		var newState = $('<div>').attr('id', 'state' + i).addClass('item');
+
+		var move = $('<div>').addClass('move');
+		// alert($("#myselect option:selected").text());
+		var title = $('<div>').addClass('title').text($("#myselect option:selected").text());
+		var connect = $('<div>').addClass('connect');
+		var showid = $('<div>').addClass('showid').text('state' + i);
+
+		newState.css({
+		  'top': e.pageY+50,
+		  'left': e.pageX
+		});
+
+		newState.append(move);
+		newState.append(title);
+		newState.append(showid);
+		newState.append(connect);
+
+		$('#container').append(newState);
+
+		jsPlumb.makeTarget(newState, {
+		  anchor: 'Continuous'
+		});
+
+		jsPlumb.makeSource(connect, {
+		  parent: newState,
+		  anchor: 'Continuous'
+		});
+		jsPlumb.draggable(newState, {
+		  containment: 'parent'
+		});
+
+		newState.dblclick(function(e) {
+		  jsPlumb.detachAllConnections($(this));
+		  $(this).remove();
+		  e.stopPropagation();
+		});
+
+		i++;
+	  });
+	});
+  </script>
+
+</html>
